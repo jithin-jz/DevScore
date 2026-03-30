@@ -128,6 +128,12 @@ def fetch_repositories(user_id):
 
     except Exception as exc:
         logger.error(f"Error fetching repos for user {user_id}: {exc}")
+        try:
+            profile = User.objects.get(id=user_id).profile
+            profile.analysis_status = "failed"
+            profile.save(update_fields=["analysis_status"])
+        except Exception:
+            pass
         raise exc
 
 
@@ -217,6 +223,12 @@ def fetch_contribution_metrics(user_id):
 
     except Exception as exc:
         logger.error(f"Error fetching metrics for user {user_id}: {exc}")
+        try:
+            profile = User.objects.get(id=user_id).profile
+            profile.analysis_status = "failed"
+            profile.save(update_fields=["analysis_status"])
+        except Exception:
+            pass
         raise exc
 
 
@@ -291,6 +303,12 @@ def analyze_all_repos_task(user_id):
 
     except Exception as exc:
         logger.error(f"Error in analyze_all_repos_task for user {user_id}: {exc}")
+        try:
+            profile = User.objects.get(id=user_id).profile
+            profile.analysis_status = "failed"
+            profile.save(update_fields=["analysis_status"])
+        except Exception:
+            pass
         raise exc
 
 

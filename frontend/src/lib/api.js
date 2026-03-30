@@ -45,6 +45,7 @@ export const getLeaderboard = () => api.get('/api/leaderboard/');
 
 // Analysis
 export const getAnalysisStatus = () => api.get('/api/analysis/status/');
+export const resetAnalysis = () => api.post('/api/analysis/reset/');
 
 // Score
 export const getScore = () => api.get('/api/score/');

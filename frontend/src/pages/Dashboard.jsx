@@ -8,6 +8,7 @@ import {
     getRecommendations,
     triggerAnalysis,
     getAnalysisStatus,
+    resetAnalysis,
     deleteAccount,
 } from '../lib/api';
 import ScoreCard from '../components/ScoreCard';
@@ -46,6 +47,8 @@ export default function Dashboard() {
     const [scanMessage, setScanMessage] = useState('');
     const [showConfirmDelete, setShowConfirmDelete] = useState(false);
     const plugRef = useRef(null);
+    const pollingStartRef = useRef(null);
+    const POLLING_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes max polling
 
     const fetchData = async () => {
         try {
@@ -70,6 +73,15 @@ export default function Dashboard() {
 
     useEffect(() => {
         fetchData();
+        // Check if an analysis is already in progress on page load
+        getAnalysisStatus()
+            .then((res) => {
+                if (res.data.status === 'pending' || res.data.status === 'analyzing') {
+                    setAnalyzing(true);
+                    pollingStartRef.current = Date.now();
+                }
+            })
+            .catch(() => {});
     }, []);
 
     useEffect(() => {
@@ -82,15 +94,36 @@ export default function Dashboard() {
 
     useEffect(() => {
         if (!analyzing) return;
+        if (!pollingStartRef.current) {
+            pollingStartRef.current = Date.now();
+        }
         const interval = setInterval(async () => {
+            // Check polling timeout
+            const elapsed = Date.now() - pollingStartRef.current;
+            if (elapsed > POLLING_TIMEOUT_MS) {
+                setAnalyzing(false);
+                pollingStartRef.current = null;
+                setScanMessage('Analysis timed out. Please try again.');
+                // Auto-reset the stuck analysis on the server
+                resetAnalysis().catch(() => {});
+                fetchData();
+                return;
+            }
             try {
                 const res = await getAnalysisStatus();
-                if (res.data.status === 'complete' || res.data.status === 'failed') {
+                if (res.data.status === 'complete') {
                     setAnalyzing(false);
+                    pollingStartRef.current = null;
+                    setScanMessage('');
                     fetchData();
                     const { getMe } = await import('../lib/api');
                     const userRes = await getMe();
                     setUser(userRes.data);
+                } else if (res.data.status === 'failed') {
+                    setAnalyzing(false);
+                    pollingStartRef.current = null;
+                    setScanMessage('Analysis failed. Please try again.');
+                    fetchData();
                 }
             } catch (err) {
                 console.error(err);
@@ -101,17 +134,35 @@ export default function Dashboard() {
 
     const handleAnalyze = async () => {
         try {
-            setAnalyzing(true);
             setScanMessage('');
+            setAnalyzing(true);
+            pollingStartRef.current = Date.now();
             await triggerAnalysis();
         } catch (err) {
             if (err.response?.status === 409) {
-                setAnalyzing(true);
+                // Check if analysis is genuinely in progress
+                try {
+                    const statusRes = await getAnalysisStatus();
+                    if (statusRes.data.status === 'pending' || statusRes.data.status === 'analyzing') {
+                        setAnalyzing(true);
+                        pollingStartRef.current = Date.now();
+                        setScanMessage('Analysis already in progress...');
+                    } else {
+                        // Status is not actually in progress — might be stale, retry
+                        setAnalyzing(false);
+                        setScanMessage('Previous analysis may have stalled. Please try again.');
+                    }
+                } catch {
+                    setAnalyzing(false);
+                    setScanMessage('Could not verify analysis status.');
+                }
             } else if (err.response?.status === 429) {
                 setAnalyzing(false);
+                pollingStartRef.current = null;
                 setScanMessage('Rate limit reached. Please wait a moment.');
             } else {
                 setAnalyzing(false);
+                pollingStartRef.current = null;
                 setScanMessage('Failed to start analysis.');
                 console.error(err);
             }
