@@ -188,4 +188,3 @@ GROQ_API_KEY = config("GROQ_API_KEY", default="")
 
 # Analysis workload tuning
 ANALYZE_MAX_REPOS_PER_RUN = config("ANALYZE_MAX_REPOS_PER_RUN", default=120, cast=int)
-
