@@ -47,6 +47,19 @@ def trigger_analysis(request):
         profile.analysis_status = "pending"
         profile.save(update_fields=["analysis_status"])
 
+        # Also clear any old tasks that might be stuck in the queue for this user
+        # to ensure the worker picks up the NEW one first.
+        try:
+            from background_task.models import Task
+            import json
+
+            # We search for tasks where the user_id was passed as a positional arg
+            # In django-background-tasks, it's stored as [[user_id], {}] in task_params field
+            user_id_str = f"[[{request.user.id}],"
+            Task.objects.filter(task_params__contains=user_id_str).delete()
+        except Exception as e:
+            logger.warning(f"Could not clear old tasks: {e}")
+
     # Start the chain by calling the first task
     fetch_repositories(request.user.id)
 
