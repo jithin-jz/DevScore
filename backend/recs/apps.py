@@ -6,4 +6,4 @@ class RecommendationsConfig(AppConfig):
     name = "recs"
 
     def ready(self):
-        import recs.tasks
+        pass

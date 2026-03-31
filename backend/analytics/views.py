@@ -51,7 +51,6 @@ def trigger_analysis(request):
         # to ensure the worker picks up the NEW one first.
         try:
             from background_task.models import Task
-            import json
 
             # We search for tasks where the user_id was passed as a positional arg
             # In django-background-tasks, it's stored as [[user_id], {}] in task_params field

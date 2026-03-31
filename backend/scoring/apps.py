@@ -6,4 +6,4 @@ class ScoringConfig(AppConfig):
     name = "scoring"
 
     def ready(self):
-        import scoring.tasks
+        pass

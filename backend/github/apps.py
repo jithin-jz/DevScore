@@ -7,4 +7,4 @@ class GithubIntegrationConfig(AppConfig):
 
     def ready(self):
         # Import tasks here to ensure they are registered for discovery
-        import github.tasks
+        pass
