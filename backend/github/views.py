@@ -9,6 +9,7 @@ from .tasks import deep_audit_repository
 
 class RepositoryListView(APIView):
     """List all repositories for the authenticated user."""
+
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -44,6 +45,7 @@ class RepositoryListView(APIView):
 
 class RepositoryAuditView(APIView):
     """Trigger a deep AI audit for a specific repository."""
+
     permission_classes = [IsAuthenticated]
 
     def post(self, request, repo_id):

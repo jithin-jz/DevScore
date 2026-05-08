@@ -4,7 +4,6 @@ from django.contrib.auth.models import User
 from django.db.models import Avg, Count, Q
 from rest_framework import status
 from rest_framework.authtoken.models import Token
-from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -16,6 +15,7 @@ from .utils import get_leaderboard_payload
 
 class LeaderboardView(APIView):
     """Return the top 100 developers ordered by dev_score."""
+
     permission_classes = [AllowAny]
 
     def get(self, request, *args, **kwargs):
@@ -28,6 +28,7 @@ class GithubLoginView(APIView):
     Exchange a GitHub OAuth code for a DRF token.
     Frontend sends { "code": "<github_oauth_code>" }
     """
+
     permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
@@ -134,6 +135,7 @@ class GithubLoginView(APIView):
 
 class UserProfileView(APIView):
     """Return authenticated user's profile."""
+
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
@@ -148,6 +150,7 @@ class UserProfileView(APIView):
 
 class DeleteAccountView(APIView):
     """Permanently delete user account and associated data."""
+
     permission_classes = [IsAuthenticated]
 
     def delete(self, request, *args, **kwargs):
@@ -161,6 +164,7 @@ class DeleteAccountView(APIView):
 
 class AdminLoginView(APIView):
     """Standard username/password login for admins."""
+
     permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
@@ -172,7 +176,8 @@ class AdminLoginView(APIView):
         user = authenticate(username=username, password=password)
         if not user or not user.is_superuser:
             return Response(
-                {"error": "Invalid admin credentials."}, status=status.HTTP_401_UNAUTHORIZED
+                {"error": "Invalid admin credentials."},
+                status=status.HTTP_401_UNAUTHORIZED,
             )
 
         # Ensure admin has a profile (use actual username to avoid unique constraint violations)
@@ -192,6 +197,7 @@ class AdminLoginView(APIView):
 
 class AdminStatsView(APIView):
     """Get system stats for the admin dashboard."""
+
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
@@ -233,6 +239,7 @@ class AdminStatsView(APIView):
 
 class AdminUserDetailView(APIView):
     """Admin endpoint to fetch or delete a specific user by their ID."""
+
     permission_classes = [IsAuthenticated]
 
     def get(self, request, user_id, *args, **kwargs):
@@ -281,7 +288,9 @@ class AdminUserDetailView(APIView):
                 }
             )
         except DeveloperProfile.DoesNotExist:
-            return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "User not found."}, status=status.HTTP_404_NOT_FOUND
+            )
 
     def delete(self, request, user_id, *args, **kwargs):
         if not request.user.is_superuser:
@@ -301,4 +310,6 @@ class AdminUserDetailView(APIView):
                 status=status.HTTP_204_NO_CONTENT,
             )
         except DeveloperProfile.DoesNotExist:
-            return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "User not found."}, status=status.HTTP_404_NOT_FOUND
+            )

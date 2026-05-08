@@ -8,6 +8,7 @@ from .serializers import ScoreBreakdownSerializer, ScoreHistorySerializer
 
 class ScoreDetailView(APIView):
     """Get current score breakdown for authenticated user."""
+
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
@@ -29,6 +30,7 @@ class ScoreDetailView(APIView):
 
 class ScoreHistoryView(APIView):
     """Get historical score entries for authenticated user."""
+
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):

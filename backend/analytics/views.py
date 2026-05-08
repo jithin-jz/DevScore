@@ -22,11 +22,14 @@ class TriggerAnalysisView(APIView):
     Pipeline: fetch repos → fetch metrics → analyze each repo → calculate score → generate recs → generate tech recs
     (Executed via a chain of background tasks)
     """
+
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
         with transaction.atomic():
-            profile = DeveloperProfile.objects.select_for_update().get(user=request.user)
+            profile = DeveloperProfile.objects.select_for_update().get(
+                user=request.user
+            )
 
             if profile.analysis_status in ("pending", "analyzing"):
                 # Check if the analysis is stale (stuck for too long)
@@ -68,6 +71,7 @@ class TriggerAnalysisView(APIView):
 
 class AnalysisStatusView(APIView):
     """Get the current analysis pipeline status."""
+
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -84,6 +88,7 @@ class AnalysisStatusView(APIView):
 
 class ResetAnalysisView(APIView):
     """Reset a stuck analysis back to idle so user can re-trigger."""
+
     permission_classes = [IsAuthenticated]
 
     def post(self, request):

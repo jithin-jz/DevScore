@@ -47,6 +47,7 @@ def generate_badge_svg(score, tier):
 
 class BadgeView(View):
     """Serve a dynamic SVG badge for a user."""
+
     def get(self, request, username):
         try:
             profile = DeveloperProfile.objects.get(github_username__iexact=username)

@@ -9,6 +9,7 @@ from .tasks import generate_tech_recs_task
 
 class RecommendationListView(APIView):
     """Get current recs for authenticated user."""
+
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -27,6 +28,7 @@ class RecommendationListView(APIView):
 
 class TechRecommendationListView(APIView):
     """Get current tech recommendations for authenticated user."""
+
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -48,6 +50,7 @@ class TechRecommendationListView(APIView):
 
 class TechRecommendationDismissView(APIView):
     """Dismiss a tech recommendation."""
+
     permission_classes = [IsAuthenticated]
 
     def post(self, request, rec_id):
@@ -62,6 +65,7 @@ class TechRecommendationDismissView(APIView):
 
 class TechRecommendationRegenerateView(APIView):
     """Manually regenerate tech recommendations."""
+
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
