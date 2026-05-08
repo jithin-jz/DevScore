@@ -157,7 +157,11 @@ REST_FRAMEWORK = {
 }
 
 # CORS
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOWED_ORIGINS = config(
+    "CORS_ALLOWED_ORIGINS",
+    default="http://localhost:5173,https://devscores.vercel.app,https://devscore.vercel.app",
+).split(",")
 CORS_ALLOW_CREDENTIALS = True
 
 # CSRF
