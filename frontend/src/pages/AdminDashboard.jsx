@@ -20,7 +20,7 @@ export default function AdminDashboard() {
             } catch (err) {
                 console.error('Failed to fetch admin stats:', err);
                 if (err.response?.status === 403 || err.response?.status === 401) {
-                    window.location.href = '/admin'; 
+                    window.location.href = '/admin';
                 }
             } finally {
                 setLoading(false);
@@ -120,28 +120,66 @@ export default function AdminDashboard() {
                                 </thead>
                                 <tbody>
                                     {stats?.recent_users?.map((u) => (
-                                        <tr key={u.id} className="border-b border-white/5 last:border-0 hover:bg-white/[0.02] transition-colors">
+                                        <tr
+                                            key={u.id}
+                                            className="border-b border-white/5 last:border-0 hover:bg-white/[0.02] transition-colors"
+                                        >
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-3">
-                                                    <img src={u.avatar_url || 'https://github.com/ghost.png'} className="w-8 h-8 rounded border border-white/10" />
-                                                    <span className="font-bold text-[12px] text-white uppercase tracking-tight">{u.github_username}</span>
+                                                    <img
+                                                        src={
+                                                            u.avatar_url ||
+                                                            'https://github.com/ghost.png'
+                                                        }
+                                                        className="w-8 h-8 rounded border border-white/10"
+                                                    />
+                                                    <span className="font-bold text-[12px] text-white uppercase tracking-tight">
+                                                        {u.github_username}
+                                                    </span>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 text-[10px] text-ds-muted font-mono">{u.email}</td>
-                                            <td className="px-6 py-4">
-                                                <span className="text-[9px] font-black uppercase text-ds-brand bg-ds-brand/10 px-2 py-1 rounded border border-ds-brand/20">{u.tier}</span>
+                                            <td className="px-6 py-4 text-[10px] text-ds-muted font-mono">
+                                                {u.email}
                                             </td>
-                                            <td className="px-6 py-4 font-black text-[14px] text-white">{Math.round(u.dev_score || 0)}</td>
                                             <td className="px-6 py-4">
-                                                <span className={`text-[9px] font-black uppercase px-2 py-1 rounded border ${u.analysis_status === 'complete' ? 'text-ds-success border-ds-success/20' : 'text-ds-muted border-white/10'}`}>
+                                                <span className="text-[9px] font-black uppercase text-ds-brand bg-ds-brand/10 px-2 py-1 rounded border border-ds-brand/20">
+                                                    {u.tier}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 font-black text-[14px] text-white">
+                                                {Math.round(u.dev_score || 0)}
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <span
+                                                    className={`text-[9px] font-black uppercase px-2 py-1 rounded border ${u.analysis_status === 'complete' ? 'text-ds-success border-ds-success/20' : 'text-ds-muted border-white/10'}`}
+                                                >
                                                     {u.analysis_status || 'Pending'}
                                                 </span>
                                             </td>
-                                            <td className="px-6 py-4 text-[10px] text-ds-muted font-mono">{new Date(u.created_at).toLocaleDateString()}</td>
+                                            <td className="px-6 py-4 text-[10px] text-ds-muted font-mono">
+                                                {new Date(u.created_at).toLocaleDateString()}
+                                            </td>
                                             <td className="px-6 py-4 text-right">
                                                 <div className="flex items-center justify-end gap-2">
-                                                    <button onClick={() => handleViewUser(u.id)} className="p-2 bg-white/5 rounded"><Eye size={12} /></button>
-                                                    {!u.is_admin && <button onClick={() => handleDeleteUser(u.id, u.github_username)} className="p-2 bg-ds-danger/10 text-ds-danger rounded"><Trash2 size={12} /></button>}
+                                                    <button
+                                                        onClick={() => handleViewUser(u.id)}
+                                                        className="p-2 bg-white/5 rounded"
+                                                    >
+                                                        <Eye size={12} />
+                                                    </button>
+                                                    {!u.is_admin && (
+                                                        <button
+                                                            onClick={() =>
+                                                                handleDeleteUser(
+                                                                    u.id,
+                                                                    u.github_username
+                                                                )
+                                                            }
+                                                            className="p-2 bg-ds-danger/10 text-ds-danger rounded"
+                                                        >
+                                                            <Trash2 size={12} />
+                                                        </button>
+                                                    )}
                                                 </div>
                                             </td>
                                         </tr>
@@ -156,19 +194,42 @@ export default function AdminDashboard() {
             {viewingUser && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm">
                     <div className="ds-panel w-full max-w-4xl max-h-[90vh] overflow-y-auto relative animate-premium-fade-in">
-                        <button onClick={() => setViewingUser(null)} className="absolute top-6 right-6 p-2 bg-white/5 rounded hover:bg-white/10 transition-colors"><X size={16} /></button>
+                        <button
+                            onClick={() => setViewingUser(null)}
+                            className="absolute top-6 right-6 p-2 bg-white/5 rounded hover:bg-white/10 transition-colors"
+                        >
+                            <X size={16} />
+                        </button>
                         <div className="space-y-8">
                             <header className="flex items-start gap-6 pb-6 border-b border-white/5">
-                                <img src={viewingUser.profile.avatar_url || 'https://github.com/ghost.png'} className="w-20 h-20 rounded-xl border border-white/10" />
+                                <img
+                                    src={
+                                        viewingUser.profile.avatar_url ||
+                                        'https://github.com/ghost.png'
+                                    }
+                                    className="w-20 h-20 rounded-xl border border-white/10"
+                                />
                                 <div className="space-y-2">
-                                    <h2 className="text-2xl font-black uppercase tracking-tight text-white">{viewingUser.profile.github_username}</h2>
-                                    <p className="text-[11px] text-ds-muted font-mono">{viewingUser.profile.email}</p>
+                                    <h2 className="text-2xl font-black uppercase tracking-tight text-white">
+                                        {viewingUser.profile.github_username}
+                                    </h2>
+                                    <p className="text-[11px] text-ds-muted font-mono">
+                                        {viewingUser.profile.email}
+                                    </p>
                                 </div>
                             </header>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <section className="space-y-6">
                                     <h3 className="ds-label">Score Profile</h3>
-                                    {viewingUser.score ? <div className="bg-black/50 p-6 rounded-xl border border-white/5"><ScoreBreakdownTable data={viewingUser.score} /></div> : <p className="text-[10px] text-ds-muted uppercase">No data.</p>}
+                                    {viewingUser.score ? (
+                                        <div className="bg-black/50 p-6 rounded-xl border border-white/5">
+                                            <ScoreBreakdownTable data={viewingUser.score} />
+                                        </div>
+                                    ) : (
+                                        <p className="text-[10px] text-ds-muted uppercase">
+                                            No data.
+                                        </p>
+                                    )}
                                 </section>
                             </div>
                         </div>

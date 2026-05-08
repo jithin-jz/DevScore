@@ -7,11 +7,11 @@ export default function BadgePreview({ username, score = 0, tier = 'Baseline' })
     const badgeUrl = `${apiBase}/badge/${username}.svg`;
     const profileUrl = window.location.origin;
 
-    const brandName = "DevScore";
+    const brandName = 'DevScore';
     const markdownCode = `[![${brandName}](${badgeUrl})](${profileUrl})`;
     const htmlCode = `<a href="${profileUrl}"><img src="${badgeUrl}" alt="${brandName}" /></a>`;
 
-    const handleCopy = (text, type) => {    
+    const handleCopy = (text, type) => {
         navigator.clipboard.writeText(text);
         setCopied(type);
         setTimeout(() => setCopied(''), 2000);

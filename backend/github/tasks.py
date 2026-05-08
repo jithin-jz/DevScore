@@ -253,8 +253,9 @@ def analyze_all_repos_task(user_id):
         if max_repos_per_run > 0 and len(stale_repos) > max_repos_per_run:
             stale_repos = sorted(
                 stale_repos,
-                key=lambda repo: repo.repo_updated_at
-                or datetime.min.replace(tzinfo=timezone.utc),
+                key=lambda repo: (
+                    repo.repo_updated_at or datetime.min.replace(tzinfo=timezone.utc)
+                ),
                 reverse=True,
             )[:max_repos_per_run]
 

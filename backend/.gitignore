@@ -35,14 +35,7 @@ celerybeat-schedule.db
 *.dat
 *.dir
 
-### Node.js / React
-node_modules/
-dist/
-dist-ssr/
-*.local
-.npm
-.vite/
-.eslintcache
+
 
 ### IDEs & Editors
 .idea/

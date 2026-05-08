@@ -12,12 +12,12 @@ export default function ScoreCard({ score, tier }) {
     const progress = (score / 100) * circumference;
 
     return (
-        <div className="ds-industrial-card flex flex-col items-center justify-between h-full bg-ds-bg-subtle w-full z-10 relative px-6 py-8">
+        <div className="ds-industrial-card flex flex-col items-center justify-between h-full bg-ds-bg-subtle w-full z-10 relative px-4 py-6 md:px-6 md:py-8">
             <h3 className="text-[9px] font-black text-ds-muted uppercase tracking-[0.4em] opacity-40">
                 Standard Index
             </h3>
 
-            <div className="relative w-28 h-28 flex items-center justify-center shrink-0 my-6">
+            <div className="relative w-24 h-24 md:w-28 md:h-28 flex items-center justify-center shrink-0 my-4 md:my-6">
                 <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
                     <circle
                         cx="50"
@@ -53,7 +53,7 @@ export default function ScoreCard({ score, tier }) {
                 </div>
             </div>
 
-            <div className="flex flex-col items-center gap-1.5 w-full pt-6 border-t border-ds-border">
+            <div className="flex flex-col items-center gap-1.5 w-full pt-4 md:pt-6 border-t border-ds-border">
                 <div className="text-[8px] font-black text-ds-muted uppercase tracking-[0.3em] opacity-40">
                     Status Check
                 </div>

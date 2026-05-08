@@ -16,7 +16,7 @@ services:
       retries: 5
 
   backend:
-    build: ./backend
+    build: .
     command: >
       sh -c "python manage.py migrate --noinput &&
              python manage.py runserver 0.0.0.0:8000"
@@ -28,10 +28,10 @@ services:
       db:
         condition: service_healthy
     volumes:
-      - ./backend:/app
+      - .:/app
 
   background_worker:
-    build: ./backend
+    build: .
     command: sh -c "sleep 10 && python manage.py process_tasks"
     env_file:
       - .env
@@ -39,10 +39,10 @@ services:
       db:
         condition: service_healthy
     volumes:
-      - ./backend:/app
+      - .:/app
 
   background_worker_2:
-    build: ./backend
+    build: .
     command: sh -c "sleep 12 && python manage.py process_tasks"
     env_file:
       - .env
@@ -50,7 +50,7 @@ services:
       db:
         condition: service_healthy
     volumes:
-      - ./backend:/app
+      - .:/app
 
 volumes:
   postgres_data:

@@ -7,12 +7,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc libpq-dev && \
     rm -rf /var/lib/apt/lists/*
 
-# Copy requirements from backend folder
-COPY backend/requirements.txt .
+# Copy requirements
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy all backend code into the container
-COPY backend/ .
+COPY . .
 
 # Make the start script executable
 RUN chmod +x start.sh

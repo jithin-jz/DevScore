@@ -1,7 +1,18 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
-import { Menu, X, Trophy, LayoutDashboard, LogOut, Star, ShieldCheck, Settings, ScanBarcode, FileText } from 'lucide-react';
+import {
+    Menu,
+    X,
+    Trophy,
+    LayoutDashboard,
+    LogOut,
+    Star,
+    ShieldCheck,
+    Settings,
+    ScanBarcode,
+    FileText,
+} from 'lucide-react';
 import { motion } from 'motion/react';
 import LayoutDashboardIcon from './ui/layout-dashboard-icon';
 import StarIcon from './ui/star-icon';
@@ -17,13 +28,16 @@ export default function Navbar() {
     const activeTab = searchParams.get('tab') || 'overview';
     const isDashboard = location.pathname === '/dashboard';
 
-    const tabs = useMemo(() => [
-        { id: 'overview', label: 'Overview', icon: LayoutDashboardIcon },
-        { id: 'growth', label: 'Growth', icon: StarIcon },
-        { id: 'auditor', label: 'Auditor', icon: ScanBarcodeIcon },
-        { id: 'report', label: 'Dossier', icon: ShieldCheckIcon },
-        { id: 'settings', label: 'Settings', icon: GearIcon },
-    ], []);
+    const tabs = useMemo(
+        () => [
+            { id: 'overview', label: 'Overview', icon: LayoutDashboardIcon },
+            { id: 'growth', label: 'Growth', icon: StarIcon },
+            { id: 'auditor', label: 'Auditor', icon: ScanBarcodeIcon },
+            { id: 'report', label: 'Dossier', icon: ShieldCheckIcon },
+            { id: 'settings', label: 'Settings', icon: GearIcon },
+        ],
+        []
+    );
 
     const [scrolled, setScrolled] = useState(false);
 
@@ -59,15 +73,15 @@ export default function Navbar() {
                         />
                         <span>{tab.label}</span>
                         {activeTab === tab.id && (
-                            <motion.div 
+                            <motion.div
                                 layoutId="nav-tab-active"
-                                className="absolute bottom-0 left-0 right-0 h-[2px] bg-ds-accent lg:hidden" 
+                                className="absolute bottom-0 left-0 right-0 h-[2px] bg-ds-accent lg:hidden"
                             />
                         )}
                         {activeTab === tab.id && (
-                            <motion.div 
+                            <motion.div
                                 layoutId="nav-tab-active-pill"
-                                className="hidden lg:block absolute -bottom-2 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-ds-accent rounded-full" 
+                                className="hidden lg:block absolute -bottom-2 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-ds-accent rounded-full"
                             />
                         )}
                     </button>
@@ -77,10 +91,10 @@ export default function Navbar() {
     };
 
     return (
-        <header 
+        <header
             className={`border-b border-ds-border transition-all duration-300 sticky top-0 z-50 ${
-                scrolled 
-                    ? 'bg-ds-bg/80 backdrop-blur-2xl shadow-xl shadow-black/5' 
+                scrolled
+                    ? 'bg-ds-bg/80 backdrop-blur-2xl shadow-xl shadow-black/5'
                     : 'bg-ds-bg/60 backdrop-blur-xl'
             }`}
         >
@@ -104,14 +118,16 @@ export default function Navbar() {
                         <Link
                             to="/leaderboard"
                             className={`text-[10px] font-black uppercase tracking-widest transition-all relative ${
-                                location.pathname === '/leaderboard' ? 'text-ds-text' : 'text-ds-muted hover:text-ds-text'
+                                location.pathname === '/leaderboard'
+                                    ? 'text-ds-text'
+                                    : 'text-ds-muted hover:text-ds-text'
                             }`}
                         >
                             Leaderboard
                             {location.pathname === '/leaderboard' && (
-                                <motion.div 
+                                <motion.div
                                     layoutId="nav-active-pill"
-                                    className="absolute -bottom-1 left-0 right-0 h-0.5 bg-ds-brand rounded-full" 
+                                    className="absolute -bottom-1 left-0 right-0 h-0.5 bg-ds-brand rounded-full"
                                 />
                             )}
                         </Link>
