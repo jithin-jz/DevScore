@@ -59,3 +59,5 @@ Thumbs.db
 htmlcov/
 pytest_report.xml
 
+### Linters
+.ruff_cache/
