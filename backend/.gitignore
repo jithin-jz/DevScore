@@ -60,6 +60,3 @@ pytest_report.xml
 ### Linters
 .ruff_cache/
 
-### Migrations
-**/migrations/*.py
-!**/migrations/__init__.py
