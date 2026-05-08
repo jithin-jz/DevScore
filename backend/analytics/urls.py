@@ -2,7 +2,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path("analyze/", views.trigger_analysis, name="trigger-analysis"),
-    path("analysis/status/", views.analysis_status, name="analysis-status"),
-    path("analysis/reset/", views.reset_analysis, name="analysis-reset"),
+    path("analyze/", views.TriggerAnalysisView.as_view(), name="trigger-analysis"),
+    path("analysis/status/", views.AnalysisStatusView.as_view(), name="analysis-status"),
+    path("analysis/reset/", views.ResetAnalysisView.as_view(), name="analysis-reset"),
 ]

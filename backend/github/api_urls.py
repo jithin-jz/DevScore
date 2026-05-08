@@ -2,10 +2,10 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path("repositories/", views.list_repositories, name="list-repositories"),
+    path("repositories/", views.RepositoryListView.as_view(), name="list-repositories"),
     path(
         "repositories/<int:repo_id>/audit/",
-        views.audit_repository,
+        views.RepositoryAuditView.as_view(),
         name="audit-repository",
     ),
 ]

@@ -1,5 +1,5 @@
 from django.http import HttpResponse
-from django.views.decorators.http import require_GET
+from django.views import View
 
 from users.models import DeveloperProfile
 
@@ -45,17 +45,17 @@ def generate_badge_svg(score, tier):
     return svg
 
 
-@require_GET
-def badge_view(request, username):
+class BadgeView(View):
     """Serve a dynamic SVG badge for a user."""
-    try:
-        profile = DeveloperProfile.objects.get(github_username__iexact=username)
-    except DeveloperProfile.DoesNotExist:
-        # Return a "not found" badge
-        svg = generate_badge_svg(0, "baseline")
-        return HttpResponse(svg, content_type="image/svg+xml", status=404)
+    def get(self, request, username):
+        try:
+            profile = DeveloperProfile.objects.get(github_username__iexact=username)
+        except DeveloperProfile.DoesNotExist:
+            # Return a "not found" badge
+            svg = generate_badge_svg(0, "baseline")
+            return HttpResponse(svg, content_type="image/svg+xml", status=404)
 
-    svg = generate_badge_svg(profile.dev_score, profile.tier)
-    response = HttpResponse(svg, content_type="image/svg+xml")
-    response["Cache-Control"] = "public, max-age=300"
-    return response
+        svg = generate_badge_svg(profile.dev_score, profile.tier)
+        response = HttpResponse(svg, content_type="image/svg+xml")
+        response["Cache-Control"] = "public, max-age=300"
+        return response
