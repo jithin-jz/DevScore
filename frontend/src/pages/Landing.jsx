@@ -43,10 +43,10 @@ export default function Landing() {
                                 </a>
                             )}
                             <Link
-                                to="/admin"
-                                className="px-8 py-3 bg-ds-accent/5 border border-ds-border hover:bg-ds-accent/10 font-black uppercase text-[10px] tracking-widest text-ds-text transition-all rounded flex items-center justify-center w-full sm:w-auto"
+                                to="/stars"
+                                className="px-8 py-3 bg-ds-warning/5 border border-ds-warning/20 hover:bg-ds-warning/10 font-black uppercase text-[10px] tracking-widest text-ds-warning transition-all rounded flex items-center justify-center gap-2 w-full sm:w-auto"
                             >
-                                Admin Login
+                                ⭐ Star Repos
                             </Link>
                         </div>
                     </div>
