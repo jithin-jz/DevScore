@@ -332,10 +332,13 @@ export default function Stars() {
         }, 300);
     };
 
-    const handleStar = async () => {
+    const handleStar = async (openUrl = false) => {
         const top = cards[0];
         if (!top) return;
         try { await recordStarClick(top.id, sessionId); } catch {}
+        if (openUrl) {
+            window.open(top.github_url, '_blank', 'noopener,noreferrer');
+        }
         dismissTop('right');
     };
 
@@ -400,7 +403,7 @@ export default function Stars() {
                             <ActionButton 
                                 color="#3b82f6" 
                                 icon={<Star size={28} fill="currentColor" />} 
-                                onClick={handleStar} 
+                                onClick={() => handleStar(true)} 
                                 label="Star"
                                 primary
                             />
