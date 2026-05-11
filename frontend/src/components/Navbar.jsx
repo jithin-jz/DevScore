@@ -131,6 +131,23 @@ export default function Navbar() {
                                 />
                             )}
                         </Link>
+                        <Link
+                            to="/stars"
+                            className={`text-[10px] font-black uppercase tracking-widest transition-all relative flex items-center gap-1.5 ${
+                                location.pathname === '/stars'
+                                    ? 'text-ds-warning'
+                                    : 'text-ds-muted hover:text-ds-warning'
+                            }`}
+                        >
+                            <Star size={10} fill="currentColor" />
+                            Stars
+                            {location.pathname === '/stars' && (
+                                <motion.div
+                                    layoutId="nav-active-pill"
+                                    className="absolute -bottom-1 left-0 right-0 h-0.5 bg-ds-warning rounded-full"
+                                />
+                            )}
+                        </Link>
                     </nav>
                 </div>
 
@@ -223,6 +240,23 @@ export default function Navbar() {
                                         </div>
                                         <div className="text-[8px] font-bold text-ds-muted uppercase tracking-tighter">
                                             Global Rankings
+                                        </div>
+                                    </div>
+                                </Link>
+                                <Link
+                                    to="/stars"
+                                    onClick={() => setIsMenuOpen(false)}
+                                    className="flex items-center gap-4 p-4 rounded-xl bg-ds-warning/5 border border-ds-warning/20 hover:bg-ds-warning/10 transition-all active:scale-[0.98] group"
+                                >
+                                    <div className="w-8 h-8 rounded-lg bg-ds-warning/10 flex items-center justify-center border border-ds-warning/20">
+                                        <Star size={16} className="text-ds-warning" fill="currentColor" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <div className="text-[11px] font-black uppercase tracking-widest text-ds-text">
+                                            Stars Feed
+                                        </div>
+                                        <div className="text-[8px] font-bold text-ds-muted uppercase tracking-tighter">
+                                            Discover &amp; star repos
                                         </div>
                                     </div>
                                 </Link>

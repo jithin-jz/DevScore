@@ -5,6 +5,7 @@ import Landing from './pages/Landing';
 import AuthCallback from './pages/AuthCallback';
 import Dashboard from './pages/Dashboard';
 import Leaderboard from './pages/Leaderboard';
+import Stars from './pages/Stars';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
 
@@ -38,6 +39,7 @@ function AppRoutes() {
             <Route element={<RootLayout />}>
                 <Route path="/" element={<Landing />} />
                 <Route path="/leaderboard" element={<Leaderboard />} />
+                <Route path="/stars" element={<Stars />} />
                 <Route
                     path="/dashboard"
                     element={

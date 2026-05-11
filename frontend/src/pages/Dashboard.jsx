@@ -29,6 +29,7 @@ import LogoutIcon from '../components/ui/logout-icon';
 import RefreshIcon from '../components/ui/refresh-icon';
 import CheckedIcon from '../components/ui/checked-icon';
 import { Award, Sparkles } from 'lucide-react';
+import PinnedReposPanel from '../components/PinnedReposPanel';
 
 export default function Dashboard() {
     const { theme, toggleTheme } = useTheme();
@@ -473,6 +474,10 @@ export default function Dashboard() {
                                 />
                             </div>
                             <div className="lg:col-span-8 space-y-8">
+                                <div className="ds-panel">
+                                    <PinnedReposPanel repos={repos} />
+                                </div>
+
                                 <section className="ds-panel space-y-8 border-ds-danger/20">
                                     <div className="flex items-center gap-4">
                                         <ShieldCheckIcon className="text-ds-danger" size={24} />

@@ -69,4 +69,18 @@ export const getAdminStats = () => api.get('/api/admin/stats/');
 export const adminDeleteUser = (userId) => api.delete(`/api/admin/users/${userId}/`);
 export const adminGetUserProfile = (userId) => api.get(`/api/admin/users/${userId}/`);
 
+// Star Feed (public — no auth needed, uses axios without token interceptor for anon calls)
+export const getStarFeed = (seenIds = []) => {
+    const params = seenIds.length ? `?seen_ids=${seenIds.join(',')}` : '';
+    return api.get(`/api/github/stars/feed/${params}`);
+};
+export const recordStarClick = (pinnedRepoId, sessionId) =>
+    api.post(`/api/github/stars/click/${pinnedRepoId}/`, { session_id: sessionId });
+
+// Pinned Repos (auth required)
+export const getPinnedRepos = () => api.get('/api/github/stars/pins/');
+export const pinRepo = (repositoryId) =>
+    api.post('/api/github/stars/pins/', { repository_id: repositoryId });
+export const unpinRepo = (pinId) => api.delete(`/api/github/stars/pins/${pinId}/`);
+
 export default api;

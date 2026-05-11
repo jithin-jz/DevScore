@@ -1,3 +1,4 @@
+import random
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -83,3 +84,56 @@ class RepositoryAudit(models.Model):
 
     def __str__(self):
         return f"Audit: {self.repository.full_name}"
+
+
+class PinnedRepo(models.Model):
+    """A repo pinned by a registered user to appear in the public Star swipe feed."""
+
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="pinned_repos"
+    )
+    repository = models.ForeignKey(
+        Repository, on_delete=models.CASCADE, related_name="pinned_by"
+    )
+    pinned_at = models.DateTimeField(auto_now=True)  # reset on re-pin for boost timer
+    click_count = models.IntegerField(default=0)  # all-time clicks
+    weekly_clicks = models.IntegerField(default=0)  # reset by weekly task
+
+    class Meta:
+        unique_together = ["user", "repository"]
+        ordering = ["-pinned_at"]
+
+    @property
+    def is_boosted(self):
+        """True if pinned within the last 48 hours — qualifies for first-6 slot."""
+        from django.utils import timezone
+
+        return (timezone.now() - self.pinned_at).total_seconds() < 172800  # 48 h
+
+    @property
+    def github_url(self):
+        return f"https://github.com/{self.repository.full_name}"
+
+    def __str__(self):
+        return f"{self.user.username} → {self.repository.full_name}"
+
+
+class RepoClickEvent(models.Model):
+    """One click-through event per visitor session per pinned repo."""
+
+    pinned_repo = models.ForeignKey(
+        PinnedRepo, on_delete=models.CASCADE, related_name="click_events"
+    )
+    session_id = models.CharField(max_length=64)  # localStorage UUID, no login needed
+    clicked_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ["pinned_repo", "session_id"]  # idempotent per session
+        indexes = [
+            models.Index(
+                fields=["pinned_repo", "-clicked_at"], name="click_pinned_created_idx"
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.pinned_repo} — {self.session_id[:8]}"
