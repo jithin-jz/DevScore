@@ -95,7 +95,7 @@
 
 @layer utilities {
     .ds-industrial-card {
-        @apply bg-ds-bg-subtle/50 border border-ds-border rounded-2xl relative overflow-hidden transition-all duration-300;
+        @apply bg-ds-card/90 backdrop-blur-2xl border border-ds-border rounded-2xl relative overflow-hidden transition-all duration-300;
     }
 
     .ds-panel {
