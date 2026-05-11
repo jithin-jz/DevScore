@@ -191,16 +191,20 @@ function RepoCard({ card, isTop, stackIndex, totalCards, onDirectStar, onSkip })
                     {/* Identity Section */}
                     <div className="flex items-center gap-4 mb-6">
                         <div 
-                            className="w-16 h-16 rounded-2xl flex items-center justify-center text-xl font-black border"
+                            className="w-16 h-16 rounded-2xl flex items-center justify-center text-xl font-black border overflow-hidden shrink-0"
                             style={{ backgroundColor: `${langColor}22`, borderColor: `${langColor}45`, color: langColor, fontFamily: 'monospace' }}
                         >
-                            {initials}
+                            {card.owner_avatar ? (
+                                <img src={card.owner_avatar} alt={card.owner_username} className="w-full h-full object-cover" />
+                            ) : (
+                                initials
+                            )}
                         </div>
-                        <div className="flex flex-col">
-                            <h3 className="text-xl font-black text-ds-text leading-none tracking-tight mb-1">
+                        <div className="flex flex-col min-w-0">
+                            <h3 className="text-xl font-black text-ds-text leading-none tracking-tight mb-1 truncate">
                                 {card.name}
                             </h3>
-                            <span className="text-xs text-ds-muted font-medium">@{card.owner_username}</span>
+                            <span className="text-xs text-ds-muted font-medium truncate">@{card.owner_username}</span>
                             <div className="flex items-center gap-1.5 mt-2">
                                 <div className="w-1 h-1 rounded-full opacity-50" style={{ backgroundColor: langColor }} />
                                 <span className="text-[10px] text-ds-muted uppercase tracking-wider">{card.primary_language || 'Open Source'}</span>
