@@ -138,6 +138,10 @@
         z-index: 9999;
     }
 
+    .bg-radial-glow {
+        background: radial-gradient(circle at center, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+    }
+
     .no-scrollbar::-webkit-scrollbar {
         display: none;
     }

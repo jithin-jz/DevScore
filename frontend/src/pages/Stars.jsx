@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { getStarFeed, recordStarClick } from '../lib/api';
-import { Star, GitFork, ExternalLink, ArrowLeft, ArrowRight, Zap, Users, Code2, CheckCircle2, X, ChevronRight, Share2, Sparkles } from 'lucide-react';
+import { Star, GitFork, ExternalLink, ArrowLeft, ArrowRight, Zap, Users, Code2, CheckCircle2, X, ChevronRight, Share2, Sparkles, Quote } from 'lucide-react';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
 
 // ─── Session helpers (no login needed) ────────────────────────────────────────
@@ -41,161 +41,222 @@ const LANG_COLORS = {
     CSS: '#563d7c', HTML: '#e34c26', Shell: '#89e051', Dart: '#00b4ab',
 };
 
-// ─── Badge chip ────────────────────────────────────────────────────────────────
-function QualityBadge({ label, active }) {
-    if (!active) return null;
+// ─── Action Button Component ──────────────────────────────────────────────────
+function ActionButton({ icon, onClick, color, label, primary = false }) {
     return (
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest bg-ds-success/10 text-ds-success border border-ds-success/20">
-            <CheckCircle2 size={8} />
-            {label}
-        </span>
+        <div className="flex flex-col items-center gap-2">
+            <button
+                onClick={onClick}
+                className={`
+                    ${primary ? 'w-20 h-20' : 'w-16 h-16'}
+                    rounded-full flex items-center justify-center transition-all active:scale-90
+                    bg-ds-bg border border-ds-border hover:border-opacity-50 group
+                    shadow-[0_8px_30px_rgb(0,0,0,0.4)]
+                `}
+                style={{
+                    borderColor: `${color}44`,
+                }}
+            >
+                <div 
+                    className="transition-transform group-hover:scale-110"
+                    style={{ color: color }}
+                >
+                    {icon}
+                </div>
+            </button>
+            <span className="text-[10px] font-black uppercase tracking-widest text-ds-muted opacity-50">{label}</span>
+        </div>
     );
 }
 
 // ─── Repo Card Component ──────────────────────────────────────────────────────
-function RepoCard({ card, onDirectStar, onSkip, isTop, stackIndex, totalCards }) {
+function RepoCard({ card, isTop, stackIndex, totalCards, onDirectStar, onSkip }) {
     const x = useMotionValue(0);
+    const y = useMotionValue(0);
     const rotate = useTransform(x, [-200, 200], [-25, 25]);
-    const opacity = useTransform(x, [-200, -150, 0, 150, 200], [0, 1, 1, 1, 0]);
-    const starOpacity = useTransform(x, [50, 150], [0, 1]);
-    const skipOpacity = useTransform(x, [-150, -50], [1, 0]);
+    const rotateY = useTransform(x, [-200, 200], [-30, 30]);
+    const scale = useTransform(x, [-200, 200], [1, 0.95]);
 
-    const handleDragEnd = (event, info) => {
+    // Opacities for the stamps
+    const likeOp = useTransform(x, [50, 150], [0, 1]);
+    const nopeOp = useTransform(x, [-50, -150], [0, 1]);
+    const superOp = useTransform(y, [-50, -150], [0, 1]);
+
+    const handleDragEnd = (_, info) => {
         if (info.offset.x > 100) {
             onDirectStar();
         } else if (info.offset.x < -100) {
             onSkip();
+        } else if (info.offset.y < -100) {
+            onDirectStar();
         }
     };
 
-    const langColor = LANG_COLORS[card.primary_language] || '#a1a1aa';
-
-    // Desktop/Mobile specific styles
-    const scale = 1 - stackIndex * 0.05;
-    const translateY = stackIndex * -15;
+    const langColor = LANG_COLORS[card.primary_language] || '#3b82f6';
+    const initials = card.owner_username.slice(0, 2).toUpperCase();
+    const matchScore = Math.floor(Math.random() * 15) + 85; 
 
     return (
         <motion.div
             style={{
                 x,
+                y,
                 rotate,
+                rotateY,
                 scale,
-                y: translateY,
                 zIndex: totalCards - stackIndex,
                 position: 'absolute',
                 width: '100%',
-                height: '100%',
+                maxWidth: '340px',
+                height: '520px',
                 touchAction: 'none',
+                perspective: '1000px',
             }}
-            drag={isTop ? 'x' : false}
-            dragConstraints={{ left: 0, right: 0 }}
+            drag={isTop ? true : false}
+            dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
             onDragEnd={handleDragEnd}
             animate={{
-                scale: 1 - stackIndex * 0.05,
-                y: stackIndex * -15,
+                scale: 1 - stackIndex * 0.08,
+                y: stackIndex * -35,
                 opacity: 1 - stackIndex * 0.2,
+                rotateZ: stackIndex * (stackIndex % 2 === 0 ? -1.5 : 1.5),
+                rotateX: stackIndex * -2,
+                x: 0,
             }}
-            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+            exit={{ 
+                x: x.get() < 0 ? -500 : 500, 
+                opacity: 0, 
+                scale: 0.5,
+                transition: { duration: 0.3 } 
+            }}
+            transition={{ 
+                type: 'spring', 
+                stiffness: 260, 
+                damping: 25,
+                mass: 0.8 
+            }}
             className="cursor-grab active:cursor-grabbing"
         >
-            {/* Visual feedback overlays */}
-            {isTop && (
-                <>
-                    <motion.div 
-                        style={{ opacity: starOpacity }}
-                        className="absolute inset-0 z-20 flex items-center justify-center bg-ds-success/20 rounded-[32px] pointer-events-none"
-                    >
-                        <div className="bg-ds-success text-white px-8 py-3 rounded-full font-black uppercase tracking-tighter flex items-center gap-2 shadow-2xl scale-125 border-4 border-white/20">
-                            <Star size={28} fill="currentColor" /> STAR
+            <div className="ds-industrial-card p-0 border-ds-border rounded-[2.5rem] relative overflow-hidden h-full flex flex-col shadow-2xl group ring-1 ring-white/10 select-none bg-[#09090b]">
+                {/* LIKE stamp */}
+                {isTop && (
+                    <motion.div style={{ opacity: likeOp }} className="absolute inset-0 z-30 pointer-events-none flex items-start p-8">
+                        <div className="border-[4px] border-ds-success rounded-xl px-4 py-1 rotate-[-15deg] bg-ds-success/10">
+                            <span className="text-2xl font-black text-ds-success tracking-widest">LIKE</span>
                         </div>
                     </motion.div>
-                    <motion.div 
-                        style={{ opacity: skipOpacity }}
-                        className="absolute inset-0 z-20 flex items-center justify-center bg-ds-danger/20 rounded-[32px] pointer-events-none"
-                    >
-                        <div className="bg-ds-danger text-white px-8 py-3 rounded-full font-black uppercase tracking-tighter flex items-center gap-2 shadow-2xl scale-125 border-4 border-white/20">
-                            <X size={28} /> SKIP
-                        </div>
-                    </motion.div>
-                </>
-            )}
+                )}
 
-            <div className="ds-industrial-card p-8 md:p-8 space-y-6 md:space-y-5 border-ds-border relative overflow-hidden h-full flex flex-col justify-between shadow-2xl">
-                <div className="space-y-8 md:space-y-6">
-                    {/* Header */}
-                    <div className="flex items-center gap-5">
-                        <img
-                            src={`https://github.com/${card.owner_username}.png?size=80`}
-                            alt={card.owner_username}
-                            className="w-14 h-14 md:w-10 md:h-10 rounded-2xl border border-ds-border flex-shrink-0"
-                            draggable={false}
-                        />
-                        <div className="flex-1 min-w-0">
-                            <p className="text-[11px] md:text-[9px] font-black text-ds-muted uppercase tracking-widest truncate">
-                                @{card.owner_username}
-                            </p>
-                            <h3 className="text-2xl md:text-base font-black text-ds-text tracking-tight truncate mt-1">
+                {/* NOPE stamp */}
+                {isTop && (
+                    <motion.div style={{ opacity: nopeOp }} className="absolute inset-0 z-30 pointer-events-none flex items-start justify-end p-8">
+                        <div className="border-[4px] border-ds-danger rounded-xl px-4 py-1 rotate-[15deg] bg-ds-danger/10">
+                            <span className="text-2xl font-black text-ds-danger tracking-widest">NOPE</span>
+                        </div>
+                    </motion.div>
+                )}
+
+                {/* SUPER stamp */}
+                {isTop && (
+                    <motion.div style={{ opacity: superOp }} className="absolute inset-0 z-30 pointer-events-none flex items-end justify-center p-12">
+                        <div className="border-[4px] border-ds-brand rounded-xl px-4 py-1 bg-ds-brand/10">
+                            <span className="text-2xl font-black text-ds-brand tracking-widest">SUPER</span>
+                        </div>
+                    </motion.div>
+                )}
+
+                {/* Top radial glow */}
+                <div 
+                    className="absolute -top-12 left-1/2 -translate-x-1/2 w-[300px] h-[220px] pointer-events-none opacity-40"
+                    style={{ background: `radial-gradient(ellipse, ${langColor}44 0%, transparent 70%)` }}
+                />
+
+                {/* Shimmer line */}
+                <div 
+                    className="absolute top-0 left-0 right-0 h-[1px] opacity-50"
+                    style={{ background: `linear-gradient(90deg, transparent 0%, ${langColor} 50%, transparent 100%)` }}
+                />
+
+                <div className="flex-1 flex flex-col p-6 relative z-10">
+                    {/* Match Badge */}
+                    <div className="flex justify-end mb-4">
+                        <div className="px-3 py-1 rounded-lg border flex items-center gap-2" style={{ backgroundColor: `${langColor}18`, borderColor: `${langColor}35` }}>
+                            <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: langColor }} />
+                            <span className="text-[10px] font-black tracking-widest" style={{ color: langColor }}>
+                                {matchScore}% MATCH
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* Identity Section */}
+                    <div className="flex items-center gap-4 mb-6">
+                        <div 
+                            className="w-16 h-16 rounded-2xl flex items-center justify-center text-xl font-black border"
+                            style={{ backgroundColor: `${langColor}22`, borderColor: `${langColor}45`, color: langColor, fontFamily: 'monospace' }}
+                        >
+                            {initials}
+                        </div>
+                        <div className="flex flex-col">
+                            <h3 className="text-xl font-black text-ds-text leading-none tracking-tight mb-1">
                                 {card.name}
                             </h3>
+                            <span className="text-xs text-ds-muted font-medium">@{card.owner_username}</span>
+                            <div className="flex items-center gap-1.5 mt-2">
+                                <div className="w-1 h-1 rounded-full opacity-50" style={{ backgroundColor: langColor }} />
+                                <span className="text-[10px] text-ds-muted uppercase tracking-wider">{card.primary_language || 'Open Source'}</span>
+                            </div>
                         </div>
-                        {card.is_boosted && (
-                            <span className="flex-shrink-0 px-3 py-1 rounded-full bg-ds-warning/10 border border-ds-warning/30 text-ds-warning text-[10px] md:text-[8px] font-black uppercase tracking-widest flex items-center gap-1">
-                                <Zap size={10} fill="currentColor" /> NEW
-                            </span>
-                        )}
                     </div>
 
-                    {/* Description */}
-                    <p className="text-[16px] md:text-[12px] text-ds-muted leading-relaxed line-clamp-6 md:line-clamp-3">
-                        {card.description || 'No description provided.'}
-                    </p>
-
-                    {/* Stats row */}
-                    <div className="flex items-center gap-6 md:gap-4">
-                        {card.primary_language && (
-                            <span className="flex items-center gap-2 text-[14px] md:text-[11px] font-bold text-ds-text-dim">
-                                <span className="w-3.5 h-3.5 md:w-2.5 md:h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: langColor }} />
-                                {card.primary_language}
-                            </span>
-                        )}
-                        <span className="flex items-center gap-1.5 text-[14px] md:text-[11px] font-bold text-ds-text-dim">
-                            <Star size={14} className="text-ds-warning" fill="currentColor" /> {card.stars.toLocaleString()}
-                        </span>
-                        <span className="flex items-center gap-1.5 text-[14px] md:text-[11px] font-bold text-ds-text-dim">
-                            <GitFork size={14} /> {card.forks}
-                        </span>
+                    {/* Bio / Description */}
+                    <div className="flex-1 bg-white/[0.02] border border-white/[0.05] rounded-2xl p-4 mb-6">
+                        <div className="relative">
+                            <Quote size={16} className="absolute -top-2 -left-2 opacity-20" style={{ color: langColor }} />
+                            <p className="text-[13px] text-ds-text-dim leading-relaxed italic line-clamp-4 pl-6 pt-1">
+                                {card.description || 'A remarkable piece of engineering waiting to be explored and integrated into your workflow.'}
+                            </p>
+                        </div>
                     </div>
 
-                    {/* Quality badges */}
-                    <div className="flex flex-wrap gap-2.5 md:gap-1.5">
-                        <QualityBadge label="CI" active={card.has_ci} />
-                        <QualityBadge label="Tests" active={card.has_tests} />
-                        <QualityBadge label="Docker" active={card.has_docker} />
-                        <QualityBadge label="Lint" active={card.has_lint} />
+                    {/* Centered Stats */}
+                    <div className="flex gap-3 mb-6">
+                        <div className="flex-1 bg-white/[0.02] border border-white/[0.05] rounded-xl py-3 text-center">
+                            <div className="text-lg font-black text-ds-text font-mono leading-none mb-1">
+                                {card.stars.toLocaleString()}
+                            </div>
+                            <div className="text-[9px] text-ds-muted uppercase tracking-[0.2em]">Stars</div>
+                        </div>
+                        <div className="flex-1 bg-white/[0.02] border border-white/[0.05] rounded-xl py-3 text-center">
+                            <div className="text-lg font-black text-ds-text font-mono leading-none mb-1">
+                                {card.forks.toLocaleString()}
+                            </div>
+                            <div className="text-[9px] text-ds-muted uppercase tracking-[0.2em]">Forks</div>
+                        </div>
+                    </div>
+
+                    {/* Quality Tags */}
+                    <div className="flex flex-wrap gap-2 mt-auto">
+                        {card.has_ci && <CardTag label="CI/CD" color={langColor} />}
+                        {card.has_tests && <CardTag label="Tests" color={langColor} />}
+                        {card.has_docker && <CardTag label="Docker" color={langColor} />}
                     </div>
                 </div>
 
-                <div className="space-y-6 md:space-y-4">
-                    {/* Social proof */}
-                    {card.weekly_clicks > 0 && (
-                        <p className="text-[12px] md:text-[10px] text-ds-muted flex items-center gap-2.5">
-                            <Users size={14} className="text-ds-muted/60" />
-                            <span><strong className="text-ds-text">{card.weekly_clicks}</strong> star engagements this week</span>
-                        </p>
-                    )}
-
-                    {/* CTA — only on top card */}
-                    {isTop && (
-                        <button
-                            onClick={(e) => { e.stopPropagation(); onDirectStar(); }}
-                            className="w-full btn-premium flex items-center justify-center gap-3 py-5 md:py-3 text-base md:text-xs font-black shadow-2xl"
-                        >
-                            <Star size={20} className="md:size-4" fill="currentColor" /> STAR ON GITHUB
-                        </button>
-                    )}
-                </div>
+                {/* Bottom Accent */}
+                <div 
+                    className="absolute bottom-0 left-[15%] right-[15%] h-[1px]"
+                    style={{ background: `linear-gradient(90deg, transparent, ${langColor}55, transparent)` }}
+                />
             </div>
         </motion.div>
+    );
+}
+
+function CardTag({ label, color }) {
+    return (
+        <span className="px-2.5 py-1 rounded-lg text-[10px] font-bold border" style={{ backgroundColor: `${color}12`, borderColor: `${color}28`, color }}>
+            {label}
+        </span>
     );
 }
 
@@ -207,8 +268,8 @@ function EmptyState({ onReset }) {
             animate={{ opacity: 1, scale: 1 }}
             className="flex flex-col items-center justify-center text-center space-y-10 py-20"
         >
-            <div className="w-24 h-24 rounded-[3rem] bg-ds-warning/10 border border-ds-warning/20 flex items-center justify-center shadow-2xl">
-                <Star size={48} className="text-ds-warning" fill="currentColor" />
+            <div className="w-24 h-24 rounded-[3rem] bg-ds-brand/10 border border-ds-brand/20 flex items-center justify-center shadow-2xl">
+                <Star size={48} className="text-ds-brand" fill="currentColor" />
             </div>
             <div className="space-y-4">
                 <h3 className="text-3xl font-black uppercase tracking-tight text-ds-text">Discovery Done!</h3>
@@ -271,7 +332,6 @@ export default function Stars() {
         const top = cards[0];
         if (!top) return;
         try { await recordStarClick(top.id, sessionId); } catch {}
-        window.open(top.github_url, '_blank', 'noopener,noreferrer');
         dismissTop('right');
     };
 
@@ -288,41 +348,28 @@ export default function Stars() {
     const isEmpty = !loading && cards.length === 0;
 
     return (
-        <div className="flex-1 flex flex-col h-screen overflow-hidden bg-black">
-            {/* DESKTOP HEADER (Preserved) */}
-            <div className="hidden md:block border-b border-ds-border bg-ds-bg/80 backdrop-blur-md sticky top-0 z-20">
-                <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-ds-warning/10 border border-ds-warning/20 flex items-center justify-center">
-                            <Star size={16} className="text-ds-warning" fill="currentColor" />
-                        </div>
-                        <div>
-                            <h1 className="text-[11px] font-black uppercase tracking-widest text-ds-text">
-                                GitHub Stars
-                            </h1>
-                            <p className="text-[9px] text-ds-muted">Discover &amp; star repos from the community</p>
-                        </div>
-                    </div>
-                    <div className="flex items-center gap-2 text-[10px] text-ds-muted">
-                        <Code2 size={12} />
-                        <span>{cards.length} in queue</span>
-                    </div>
-                </div>
-            </div>
+        <div className="flex-1 flex flex-col h-screen overflow-hidden bg-black relative">
+            {/* Background Aesthetics */}
+            <div className="absolute inset-0 z-0 opacity-20" 
+                 style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0)', backgroundSize: '40px 40px' }} 
+            />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-radial-glow opacity-30 pointer-events-none" />
+            
+
 
             {/* MAIN CONTENT */}
             <div className="flex-1 flex flex-col items-center justify-center px-4 relative z-10 overflow-hidden">
                 {loading && cards.length === 0 ? (
                     <div className="flex flex-col items-center gap-6">
-                        <div className="w-16 h-16 border-4 border-ds-border border-t-ds-warning rounded-full animate-spin" />
+                        <div className="w-16 h-16 border-4 border-ds-border border-t-ds-brand rounded-full animate-spin" />
                         <p className="text-xs font-black text-ds-muted uppercase tracking-[0.3em]">Discovery Initializing</p>
                     </div>
                 ) : isEmpty ? (
                     <EmptyState onReset={handleReset} />
                 ) : (
-                    <div className="w-full max-w-[95%] md:max-w-xs flex flex-col items-center h-[80vh] md:h-auto">
+                    <div className="w-full max-w-[340px] flex flex-col items-center justify-center">
                         {/* Card stack */}
-                        <div className="relative w-full h-full md:h-[310px]">
+                        <div className="relative w-full h-[520px] flex items-center justify-center">
                             <AnimatePresence mode="popLayout">
                                 {visibleCards.map((card, i) => (
                                     <RepoCard
@@ -338,20 +385,28 @@ export default function Stars() {
                             </AnimatePresence>
                         </div>
 
-                        {/* DESKTOP Action buttons (Preserved) */}
-                        <div className="hidden md:flex items-center justify-center gap-6 mt-2">
-                            <button onClick={handleSkip} className="w-14 h-14 rounded-2xl bg-ds-bg border border-ds-border flex items-center justify-center text-ds-muted hover:text-ds-danger transition-all active:scale-95">
-                                <X size={20} />
-                            </button>
-                            <button onClick={handleStar} className="w-16 h-16 rounded-2xl bg-ds-warning/10 border border-ds-warning/40 flex items-center justify-center text-ds-warning transition-all active:scale-95 shadow-lg shadow-ds-warning/10">
-                                <Star size={22} fill="currentColor" />
-                            </button>
-                            <button onClick={() => dismissTop('right')} className="w-14 h-14 rounded-2xl bg-ds-bg border border-ds-border flex items-center justify-center text-ds-muted transition-all active:scale-95">
-                                <ChevronRight size={20} />
-                            </button>
+                        {/* Action buttons */}
+                        <div className="flex items-center justify-center gap-6 mt-8">
+                            <ActionButton 
+                                color="#ef4444" 
+                                icon={<X size={24} />} 
+                                onClick={handleSkip} 
+                                label="Skip"
+                            />
+                            <ActionButton 
+                                color="#3b82f6" 
+                                icon={<Star size={28} fill="currentColor" />} 
+                                onClick={handleStar} 
+                                label="Star"
+                                primary
+                            />
+                            <ActionButton 
+                                color="#10b981" 
+                                icon={<ChevronRight size={24} />} 
+                                onClick={() => dismissTop('right')} 
+                                label="Next"
+                            />
                         </div>
-
-
                     </div>
                 )}
             </div>
